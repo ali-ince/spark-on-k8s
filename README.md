@@ -19,6 +19,12 @@ kubectl create serviceaccount spark
 kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
 ```
 
+Create docker image:
+
+```shell
+${spark_home}/bin/docker-image-tool.sh -r docker.io/connectors-pyspark -t v3.4.0 -p ${spark_home}/kubernetes/dockerfiles/spark/bindings/python/Dockerfile build
+```
+
 Launch a Job:
 ```shell
 spark-submit \
@@ -28,5 +34,5 @@ spark-submit \
   --conf spark.kubernetes.container.image=connectors-pyspark/spark-py:v3.4.0 \
   --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
   --conf spark.jars=https://github.com/neo4j-contrib/neo4j-spark-connector/releases/download/5.1.0/neo4j-connector-apache-spark_2.12-5.1.0_for_spark_3.jar \
-  https://raw.githubusercontent.com/ali-ince/spark-on-k8s/main/push-to-neo4j.py
+  https://raw.githubusercontent.com/neo-technology/spark-on-k8s/main/push-to-neo4j.py
 ```
