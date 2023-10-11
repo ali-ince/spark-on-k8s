@@ -15,7 +15,7 @@ if __name__ == "__main__":
         .mode("append") \
         .option("url", "neo4j://10.99.115.105:7687") \
         .option("authentication.basic.username", "neo4j") \
-        .option("authentication.basic.password", "password") \
+        .option("authentication.basic.password", "passw0rd") \
         .option("labels", ":Person") \
         .save()
 
