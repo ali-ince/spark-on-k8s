@@ -25,14 +25,36 @@ Create docker image:
 ${spark_home}/bin/docker-image-tool.sh -r docker.io/connectors-pyspark -t v3.4.0 -p ${spark_home}/kubernetes/dockerfiles/spark/bindings/python/Dockerfile build
 ```
 
-Launch a Job:
+Install python3 and configure:
 ```shell
+python3 -m venv venv
+python3 -m pip -r requirements.txt
+```
+
+Launch a Job:
+
+(`/private/tmp` is probably MacOS specific, you might need to reconfigure it based on your OS/Docker/K8S configuration)
+
+```shell
+SOURCE_DIR=/private/tmp/spark-on-k8s
+VOLUME_TYPE=hostPath
+VOLUME_NAME=spark-on-k8s
+MOUNT_PATH=/private/tmp/spark-on-k8s
+
 spark-submit \
   --master k8s://https://kubernetes.docker.internal:6443 \
   --deploy-mode cluster \
   --name spark-test \
+  --packages org.neo4j:neo4j-connector-apache-spark_2.12:5.2.0_for_spark_3,org.postgresql:postgresql:42.6.0 \
+  --conf spark.kubernetes.file.upload.path=$SOURCE_DIR \
+  --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.path=$MOUNT_PATH \
+  --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.type=Directory \
+  --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
+  --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.path=$MOUNT_PATH \
+  --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.type=Directory \
+  --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
   --conf spark.kubernetes.container.image=connectors-pyspark/spark-py:v3.4.0 \
   --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
-  --conf spark.jars=https://github.com/neo4j-contrib/neo4j-spark-connector/releases/download/5.1.0/neo4j-connector-apache-spark_2.12-5.1.0_for_spark_3.jar \
-  https://raw.githubusercontent.com/neo-technology/spark-on-k8s/main/push-to-neo4j.py
+  --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/tmp -Divy.home=/tmp" \
+  push-to-neo4j.py
 ```
