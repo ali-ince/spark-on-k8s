@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     spark.read.jdbc("jdbc:postgresql://data-import-experiment-postgres.cgzrnuxjdpso.us-east-1.rds.amazonaws.com:5432",
                     "northwind",
-                    properties={"user": "postgres", "password": "mypassword", "driver": "com.postgresql.Driver"})
+                    properties={"user": "postgres", "password": "mypassword", "driver": "org.postgresql.Driver"})
 
     df = spark.createDataFrame([("John Doe", 32), ("Jane Doe", 42)], ["name", "age"])
 
