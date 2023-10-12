@@ -28,6 +28,7 @@ ${spark_home}/bin/docker-image-tool.sh -r docker.io/connectors-pyspark -t v3.4.0
 Install python3 and configure:
 ```shell
 python3 -m venv venv
+source venv/bin/activate
 python3 -m pip -r requirements.txt
 ```
 
